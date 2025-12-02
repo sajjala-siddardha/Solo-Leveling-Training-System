@@ -1,24 +1,84 @@
-<<<<<<< HEAD
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# ⚔️ SOLO LEVELING – TRAINING SYSTEM
 
-# Run and deploy your AI Studio app
+A futuristic gamified training platform inspired by **Solo Leveling**, built using **React + TypeScript + Vite**.  
+Train daily, level up, equip gear, purchase items, survive penalties, and speak with the AI “SYSTEM” powered by Google Gemini.
 
-This contains everything you need to run your app locally.
+---
 
-View your app in AI Studio: https://ai.studio/apps/drive/14b_XUbd4P8oXwygBrlqibtbaHp5vJ77n
+## ⭐ FEATURES
 
-## Run Locally
+### 🔥 Daily Quest System  
+✔ Pushups, Situps, Squats, Running tracking  
+✔ XP + Gold rewards  
+✔ Auto-leveling with stat points  
+✔ Daily streak bonuses  
+✔ Penalty Mode at 20:00 (STRUGGLE to survive)  
 
-**Prerequisites:**  Node.js
+### 👤 Player Status & Leveling  
+✔ Level, Rank, Job, Title  
+✔ Stats: Strength, Agility, Sense, Vitality, Intelligence  
+✔ Upgrade stats using level-up points  
+✔ Status window shows equipped bonuses  
+
+### 🧰 Item Box & Item Shop  
+✔ Potions, Mystery Boxes, Dungeon Keys  
+✔ Gear (weapons, armor, cloak, gloves, boots, rings, necklace)  
+✔ Legendary Runes  
+✔ Each item has rarity + optional stat bonuses  
+✔ Equip / Unequip gear  
+✔ Inventory saved locally  
+
+### 🧠 AI SYSTEM CONSULTANT (Gemini)  
+✔ Real-time AI system responses  
+✔ Scrollable message window  
+✔ “CLEAR CHAT” button  
+✔ Auto-saves conversation per user  
+
+### 🔔 Notifications  
+✔ Desktop reminders  
+✔ Sound effects for level-up, alerts, penalties  
+
+---
+
+## 🛠 TECH STACK
+
+| Technology | Usage |
+|-----------|-------|
+| React + TypeScript | UI + Game logic |
+| Vite | Compiler & bundler |
+| TailwindCSS | Styling |
+| LocalStorage | Persistence |
+| Google Gemini API | System AI |
+| Vercel | Hosting |
+
+---
+
+## 📁 PROJECT STRUCTURE
+
+src/
+├── App.tsx
+├── main.tsx
+├── types.ts
+├── components/
+│ ├── QuestTracker.tsx
+│ ├── StatusWindow.tsx
+│ ├── SystemChat.tsx
+│ ├── SystemComponents.tsx
+├── services/
+│ ├── geminiService.ts
+│ ├── inventoryService.ts
+│ ├── notificationService.ts
+│ ├── soundService.ts
+│ ├── storage.ts
+public/
+├── index.html
+.env.local ← (contains API key, DO NOT upload)
 
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
-=======
-# Solo-Leveling-Training-System
->>>>>>> 0a9ce27e0d36f7e0fd20cc5b644aaf173e0d0f47
+---
+
+## 🚀 INSTALLATION GUIDE
+
+### 1️⃣ Install dependencies
+```sh
+npm install
