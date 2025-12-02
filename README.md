@@ -51,8 +51,8 @@ public/
 .gitignore        ← (prevents .env.local from uploading)
 package.json
 vite.config.ts
-README.md```
-
+README.md
+```
 🔐 Environment Setup
 Create a file:
 
@@ -67,6 +67,7 @@ VITE_GEMINI_API_KEY=YOUR_API_KEY_HERE
 ⚠️ Never upload this file
 It is already protected using .gitignore.
 
+---
 🛠 Installation
 bash
 Copy code
@@ -97,18 +98,14 @@ ini
 Copy code
 VITE_GEMINI_API_KEY=YOUR_KEY
 Deploy ✔
-
+---
 🤖 System Chat Example
 Ask for training routines
-
 Ask for diet advice
-
 Ask for strategy upgrades
-
 Ask for Solo Leveling themed responses
-
 Clear chat anytime
-
+---
 📦 Inventory & Gear System
 Buy items from the Shop
 
@@ -119,7 +116,7 @@ Inventory saved in LocalStorage
 Runes give special buffs
 
 Potions give one-time boosts
-
+---
 🔥 Penalty Mode
 After 20:00, if quests are not completed:
 
@@ -130,7 +127,7 @@ User must survive by clicking
 Dramatic sound effects
 
 Inspired by anime time-limit penalties
-
+---
 🧙 Powered By
 React + TypeScript
 
@@ -141,11 +138,11 @@ Gemini AI
 TailwindCSS
 
 LocalStorage Persistence
-
+---
 ⭐ Give the Project a Star!
 If you like the project, please ⭐ the repo!
 More features coming soon — raids, dungeon mode, awakening system, pets, and more.
-
+---
 📞 Developer
 Built by Sajjala Siddardha
 Solo Leveling Inspired Training Assistant
