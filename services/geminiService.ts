@@ -1,67 +1,91 @@
 // src/services/geminiService.ts
-
 import { GoogleGenAI } from "@google/genai";
 import { User } from "../types";
 
-// ✅ FIX 1: Make Vite env access safe for Vercel Build
-const apiKey = import.meta.env.VITE_GEMINI_API_KEY as string;
+// ✅ Fix for Vercel — declare import.meta.env types
+declare const importMeta: {
+  env: {
+    VITE_GEMINI_API_KEY: string;
+  };
+};
 
-if (!apiKey) {
-  console.warn("❌ VITE_GEMINI_API_KEY is missing. Check .env.local or Vercel Env Vars.");
-}
+// ✅ Get API key from Vite env
+const getAiClient = () => {
+  const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
 
-// Create AI client safely
-const ai = new GoogleGenAI({ apiKey });
+  if (!apiKey) {
+    console.error("❌ Gemini API Key missing");
+    return null;
+  }
 
-// ---------------------------------------------------
+  return new GoogleGenAI({ apiKey });
+};
+
+// =======================================
+// MAIN FUNCTION
+// =======================================
 
 export const generateSystemMessage = async (
   context: "LOGIN" | "LEVEL_UP" | "FAILURE" | "ADVICE" | "REMINDER" | "PENALTY",
   user: User,
   userQuery?: string
 ): Promise<string> => {
+  const ai = getAiClient();
+  if (!ai) return "SYSTEM ERROR: API KEY NOT FOUND.";
+
   const modelId = "gemini-2.5-flash";
 
+  // =====================================================
+  // SYSTEM INSTRUCTION (TONE CONTROL)
+  // =====================================================
   const baseSystemInstruction = `
-    You are 'The System' from Solo Leveling.
-    Speak with a robotic, cold, dominating tone.
-    Refer to user as 'Player'.
-    Use RPG terms like Stats, Level, Title, Rank, Penalty Zone.
-    Format like a system notification window.
+    You are "The System" from Solo Leveling.
+    You respond in a robotic, cold, authoritative style.
+    Address the user as "Player".
+    Keep messages short unless the user asks for advice.
+    Always follow the theme of RPG stats, quests, ranks, leveling.
   `;
 
+  // =====================================================
+  // PROMPT BASED ON CONTEXT
+  // =====================================================
   let prompt = "";
 
   switch (context) {
     case "LOGIN":
-      prompt = `Player has logged in. Level: ${user.level}. Streak: ${user.streak}. Welcome them and remind about today's Daily Quest.`;
+      prompt = `Player ${user.username} has logged in. Level ${user.level}. Welcome them back and remind them of today's Daily Quest.`;
       break;
 
     case "LEVEL_UP":
-      prompt = `Player reached Level ${user.level}. Congratulate coldly. Tell them to allocate stat points.`;
+      prompt = `Player reached Level ${user.level}. Issue a system-style level-up announcement.`;
       break;
 
     case "FAILURE":
-      prompt = `Player failed the daily quest. Warn them about the Penalty Zone.`;
+      prompt = `Player failed today's Daily Quest. Warn them about the Penalty Zone.`;
       break;
 
     case "ADVICE":
-      prompt = `Player asks: "${userQuery}". Provide fitness-RPG advice. Keep it under 100 words.`;
+      prompt = `Player requests advice: "${userQuery}". Provide fitness-themed RPG advice. Max 100 words.`;
       break;
 
     case "REMINDER":
-      prompt = `Player is late. Remind them the Daily Quest remains incomplete. Threaten the Penalty Zone.`;
+      prompt = `Daily Quest not completed. Give a short threatening reminder about the Penalty Zone.`;
       break;
 
     case "PENALTY":
-      prompt = `Player triggered Penalty Quest: Survival. Describe the danger in a menacing, Solo Leveling tone.`;
+      prompt = `Player triggered Penalty Mode. Describe the challenge in a dramatic, dangerous tone.`;
       break;
   }
 
+  // =====================================================
+  // GEMINI REQUEST
+  // =====================================================
   try {
     const result = await ai.models.generateContent({
       model: modelId,
       contents: prompt,
+
+      // ✅ Correct placement — works with Vercel & TypeScript
       config: {
         systemInstruction: baseSystemInstruction,
       },
@@ -69,7 +93,7 @@ export const generateSystemMessage = async (
 
     return result.text || "SYSTEM: CONNECTION UNSTABLE.";
   } catch (err) {
-    console.error("Gemini API ERROR:", err);
+    console.error("❌ Gemini API Error:", err);
     return "SYSTEM: OFFLINE.";
   }
 };
