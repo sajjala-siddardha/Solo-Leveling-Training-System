@@ -1,60 +1,76 @@
-# ⚔️ SOLO LEVELING – TRAINING SYSTEM
+# ⚔️ SOLO LEVELING — TRAINING SYSTEM (React + Vite)
 
-A futuristic gamified training platform inspired by **Solo Leveling**, built using **React + TypeScript + Vite**.  
-Train daily, level up, equip gear, purchase items, survive penalties, and speak with the AI “SYSTEM” powered by Google Gemini.
+A full gamified fitness system inspired by **Solo Leveling**.  
+Players complete daily quests, level up, earn gold, buy items, equip gear, gain bonuses, survive penalties, and receive AI-generated guidance — all inside a futuristic “System Interface”.
 
----
-
-## ⭐ FEATURES
-
-### 🔥 Daily Quest System  
-✔ Pushups, Situps, Squats, Running tracking  
-✔ XP + Gold rewards  
-✔ Auto-leveling with stat points  
-✔ Daily streak bonuses  
-✔ Penalty Mode at 20:00 (STRUGGLE to survive)  
-
-### 👤 Player Status & Leveling  
-✔ Level, Rank, Job, Title  
-✔ Stats: Strength, Agility, Sense, Vitality, Intelligence  
-✔ Upgrade stats using level-up points  
-✔ Status window shows equipped bonuses  
-
-### 🧰 Item Box & Item Shop  
-✔ Potions, Mystery Boxes, Dungeon Keys  
-✔ Gear (weapons, armor, cloak, gloves, boots, rings, necklace)  
-✔ Legendary Runes  
-✔ Each item has rarity + optional stat bonuses  
-✔ Equip / Unequip gear  
-✔ Inventory saved locally  
-
-### 🧠 AI SYSTEM CONSULTANT (Gemini)  
-✔ Real-time AI system responses  
-✔ Scrollable message window  
-✔ “CLEAR CHAT” button  
-✔ Auto-saves conversation per user  
-
-### 🔔 Notifications  
-✔ Desktop reminders  
-✔ Sound effects for level-up, alerts, penalties  
+Built with:
+- **React + TypeScript**
+- **Vite**
+- **LocalStorage Persistence**
+- **Google Gemini API (for System Assistant)**
 
 ---
 
-## 🛠 TECH STACK
+## 🚀 FEATURES
 
-| Technology | Usage |
-|-----------|-------|
-| React + TypeScript | UI + Game logic |
-| Vite | Compiler & bundler |
-| TailwindCSS | Styling |
-| LocalStorage | Persistence |
-| Google Gemini API | System AI |
-| Vercel | Hosting |
+### 🧩 Player System
+- Login with **name + Gmail**
+- Persistent user data (level, XP, gold, stats, streak)
+
+### 🏋️ Daily Training Quest
+- Push-ups, Sit-ups, Squats, Running
+- Auto reset daily
+- Rewards XP + Gold on completion
+
+### 🏆 Leveling System
+- Level up automatically
+- Earn stat points
+- XP scaling per level
+
+### 🛒 Item Shop
+- Buy Potions, Mystery Boxes, Dungeon Keys  
+- Buy Gear (Weapon/Armor/Cloak/Boots/Gloves/Rings/Necklace)
+- Buy Legendary Runes
+- Items added to **Item Box**
+
+### 📦 Item Box (Inventory)
+- View, Equip, Use, Discard items  
+- Gear gives stats  
+- Runes give bonuses
+
+### 🧰 Equipment System
+- Equip items to dedicated slots  
+- Unequip items anytime  
+- Auto-calculated **gear bonus stats**
+
+### ⚠️ Penalty Mode
+- If quest not finished by **8 PM**
+- System triggers a penalty survival mode
+- Player must tap 50 times to escape
+
+### 💬 System Consultant (AI Chat)
+- Ask questions to the “System”
+- Powered by Google Gemini API
+- Messages are stored per user
+- CLEAR button resets chat
+
+---
+
+## 🛠️ TECH STACK
+
+| Technology | Purpose |
+|-----------|---------|
+| React + Vite | Frontend Framework |
+| TypeScript | Strong typing |
+| LocalStorage | User persistence |
+| TailwindCSS | UI Styling |
+| Google Gemini API | AI chat system |
 
 ---
 
 ## 📁 PROJECT STRUCTURE
 
+```txt
 src/
 │── App.tsx
 │── main.tsx
@@ -77,16 +93,58 @@ src/
 public/
 │── index.html
 │
-.env.local        ← (contains API key, DO NOT upload)
-.gitignore        ← (hides .env.local automatically)
+.env.local        ← (HIDDEN — contains API key)
+.gitignore        ← (prevents .env.local from uploading)
 package.json
 vite.config.ts
 README.md
 
 ---
 
-## 🚀 INSTALLATION GUIDE
+🔧 INSTALLATION
+1️⃣ Clone the Repository
+git clone https://github.com/YOUR-USERNAME/YOUR-REPO.git
+cd YOUR-REPO
 
-### 1️⃣ Install dependencies
-```sh
+2️⃣ Install Dependencies
 npm install
+
+3️⃣ Create .env.local
+VITE_GEMINI_API_KEY=YOUR_API_KEY_HERE
+
+
+IMPORTANT:
+.env.local is automatically protected by .gitignore.
+NEVER upload your API key.
+
+4️⃣ Start Development Server
+npm run dev
+
+🌐 DEPLOY TO VERCEL (SAFE API KEY)
+✔ Step 1: Push to GitHub
+
+Your .env.local will NOT be uploaded (safe).
+
+✔ Step 2: On Vercel Dashboard → Project → Settings → Environment Variables
+
+Add:
+
+KEY: VITE_GEMINI_API_KEY
+VALUE: your_api_key
+
+
+✔ Deploy
+✔ No API key leakage
+✔ Works perfectly
+
+👑 CREDITS
+
+Developer: Sajjala Siddardha
+
+AI System Integration: Gemini API
+
+Inspiration: Solo Leveling Webtoon
+
+🛡️ LICENSE
+
+This project is for educational and personal use.
