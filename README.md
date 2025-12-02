@@ -56,24 +56,32 @@ Train daily, level up, equip gear, purchase items, survive penalties, and speak 
 ## 📁 PROJECT STRUCTURE
 
 src/
-├── App.tsx
-├── main.tsx
-├── types.ts
+│── App.tsx
+│── main.tsx
+│── types.ts
+│
 ├── components/
-│ ├── QuestTracker.tsx
-│ ├── StatusWindow.tsx
-│ ├── SystemChat.tsx
-│ ├── SystemComponents.tsx
+│   │── ItemBox.tsx
+│   │── QuestTracker.tsx
+│   │── StatusWindow.tsx
+│   │── SystemChat.tsx
+│   └── SystemComponents.tsx
+│
 ├── services/
-│ ├── geminiService.ts
-│ ├── inventoryService.ts
-│ ├── notificationService.ts
-│ ├── soundService.ts
-│ ├── storage.ts
+│   │── geminiService.ts
+│   │── inventoryService.ts
+│   │── notificationService.ts
+│   │── soundService.ts
+│   └── storage.ts
+│
 public/
-├── index.html
-.env.local ← (contains API key, DO NOT upload)
-
+│── index.html
+│
+.env.local        ← (contains API key, DO NOT upload)
+.gitignore        ← (hides .env.local automatically)
+package.json
+vite.config.ts
+README.md
 
 ---
 
