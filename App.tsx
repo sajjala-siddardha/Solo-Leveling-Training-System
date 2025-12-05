@@ -35,26 +35,21 @@ const App: React.FC = () => {
   const [todayProgress, setTodayProgress] = useState<DailyProgress | null>(null);
   const [systemNotif, setSystemNotif] = useState<string | null>(null);
 
-  // Inputs
   const [nameInput, setNameInput] = useState('');
   const [emailInput, setEmailInput] = useState('');
 
-  // UI
   const [showShop, setShowShop] = useState(false);
   const [showItemBox, setShowItemBox] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
 
-  // Penalty
   const [penaltyActive, setPenaltyActive] = useState(false);
   const [penaltyClicks, setPenaltyClicks] = useState(0);
   const [penaltyGateOpen, setPenaltyGateOpen] = useState(false);
 
-  // Inventory
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
 
   const todayStr = new Date().toISOString().split('T')[0];
 
-  // ---- Helpers: Equipped Bonuses ----
   const getEquippedBonuses = (u: User | null, inv: InventoryItem[]): Partial<Stats> => {
     const empty: Partial<Stats> = {
       strength: 0,
@@ -66,7 +61,6 @@ const App: React.FC = () => {
     if (!u || !u.equipment) return empty;
 
     const result: Partial<Stats> = { ...empty };
-
     const slots: EquipmentSlot[] = [
       'weapon',
       'armor',
@@ -90,19 +84,17 @@ const App: React.FC = () => {
         (result as any)[key] = ((result as any)[key] || 0) + val;
       }
     }
-
     return result;
   };
 
   const equippedBonuses = getEquippedBonuses(user, inventory);
 
-  // ---- INIT ----
+  // INIT
   useEffect(() => {
     const sessionUser = loadCurrentSession();
     if (sessionUser) {
       setUser(sessionUser);
       checkDailyReset(sessionUser);
-
       const inv = loadInventory(sessionUser.email);
       setInventory(inv);
 
@@ -115,19 +107,12 @@ const App: React.FC = () => {
         setNotificationsEnabled(true);
       }
     }
-
     setLoading(false);
   }, []);
 
-  // ---- PENALTY (20:00) ----
+  // PENALTY AFTER 20:00
   useEffect(() => {
-    if (
-      !user ||
-      !todayProgress ||
-      todayProgress.completed ||
-      todayProgress.penaltySurvived ||
-      penaltyActive
-    )
+    if (!user || !todayProgress || todayProgress.completed || todayProgress.penaltySurvived || penaltyActive)
       return;
 
     const checkTime = () => {
@@ -136,23 +121,14 @@ const App: React.FC = () => {
         triggerPenalty('TIME LIMIT EXCEEDED (20:00). PENALTY INITIATED.');
       }
     };
-
     const interval = setInterval(checkTime, 30000);
     checkTime();
-
     return () => clearInterval(interval);
   }, [user, todayProgress, penaltyActive]);
 
-  // ---- AI REMINDER ----
+  // NOTIFICATION REMINDERS
   useEffect(() => {
-    if (
-      !user ||
-      !todayProgress ||
-      todayProgress.completed ||
-      todayProgress.penaltySurvived ||
-      !notificationsEnabled ||
-      penaltyActive
-    )
+    if (!user || !todayProgress || todayProgress.completed || todayProgress.penaltySurvived || !notificationsEnabled || penaltyActive)
       return;
 
     const timer = setTimeout(async () => {
@@ -168,7 +144,6 @@ const App: React.FC = () => {
     return () => clearTimeout(timer);
   }, [user, todayProgress, notificationsEnabled, penaltyActive]);
 
-  // ---- DAILY RESET ----
   const checkDailyReset = (currentUser: User) => {
     const lastLog = currentUser.history[currentUser.history.length - 1];
 
@@ -188,24 +163,19 @@ const App: React.FC = () => {
     }
   };
 
-  // ---- LOGIN ----
   const handleLogin = () => {
     if (!nameInput.trim() || !emailInput.trim()) return;
-
     if (!emailInput.includes('@')) {
       soundService.playError();
       return;
     }
 
     const exists = checkUserExists(emailInput);
-    if (exists) {
-      alert('Account already registered. Logging in...');
-    }
+    if (exists) alert('Account already registered. Logging in...');
 
     const { user: loggedInUser } = loginUser(emailInput, nameInput);
     setUser(loggedInUser);
     checkDailyReset(loggedInUser);
-
     const inv = loadInventory(loggedInUser.email);
     setInventory(inv);
 
@@ -222,7 +192,7 @@ const App: React.FC = () => {
     setInventory([]);
     soundService.playClick();
   };
-  // ---- NOTIFICATION PERMISSION ----
+
   const enableNotifications = async () => {
     const granted = await requestNotificationPermission();
     setNotificationsEnabled(granted);
@@ -236,14 +206,9 @@ const App: React.FC = () => {
       soundService.playNotification();
     }
   };
-
-  // ---- QUEST PROGRESS ----
   const updateProgress = (field: keyof DailyProgress, value: number) => {
     if (!todayProgress) return;
-
-    setTodayProgress((prev) =>
-      prev ? { ...prev, [field]: value } : prev
-    );
+    setTodayProgress((prev) => (prev ? { ...prev, [field]: value } : prev));
   };
 
   const completeQuest = async () => {
@@ -296,9 +261,141 @@ const App: React.FC = () => {
     } else {
       setSystemNotif('DAILY QUEST COMPLETED. REWARDS ACCEPTED.');
     }
+
+    if (prog.newJob) {
+      setTimeout(() => {
+        soundService.playConfirm();
+        setSystemNotif(`CLASS CHANGE: You have advanced to [${prog.newJob}].`);
+      }, 4000);
+    } else if (prog.newRank) {
+      setTimeout(() => {
+        soundService.playConfirm();
+        setSystemNotif(`RANK UPDATE: Evaluated as [${prog.newRank}].`);
+      }, 4000);
+    }
   };
 
-  // ---- SHOP PURCHASE ----
+  const triggerPenalty = async (reason?: string) => {
+    if (!user) return;
+
+    setPenaltyActive(true);
+    setPenaltyClicks(50);
+    setPenaltyGateOpen(false);
+
+    soundService.playAlarm();
+
+    const penaltyMsg = await generateSystemMessage('PENALTY', user);
+    setSystemNotif(reason ? `${reason}\n\n${penaltyMsg}` : penaltyMsg);
+
+    const interval = setInterval(() => {
+      if (Math.random() > 0.6 && !penaltyGateOpen) soundService.playAlarm();
+    }, 2000);
+
+    (window as any).penaltyInterval = interval;
+  };
+
+  const handleSurviveClick = () => {
+    if (penaltyClicks > 0) {
+      setPenaltyClicks((prev) => prev - 1);
+      soundService.playClick();
+
+      if (penaltyClicks === 1) {
+        setPenaltyGateOpen(true);
+        soundService.playLevelUp();
+        if ((window as any).penaltyInterval) clearInterval((window as any).penaltyInterval);
+      }
+      return;
+    }
+
+    if (penaltyGateOpen) {
+      setPenaltyActive(false);
+      setPenaltyGateOpen(false);
+
+      setSystemNotif('PENALTY SURVIVED. REWARD: NONE.');
+      soundService.playConfirm();
+
+      if (todayProgress && user) {
+        const updated = { ...todayProgress, penaltySurvived: true };
+        setTodayProgress(updated);
+
+        const newHistory = user.history.filter((h) => h.date !== todayStr);
+        newHistory.push(updated);
+
+        const updatedUser = { ...user, history: newHistory };
+        setUser(updatedUser);
+        saveUser(updatedUser);
+      }
+    }
+  };
+
+  const upgradeStat = (stat: keyof Stats) => {
+    if (!user || user.stats.availablePoints <= 0) {
+      soundService.playError();
+      return;
+    }
+
+    const updatedUser: User = {
+      ...user,
+      stats: {
+        ...user.stats,
+        [stat]: user.stats[stat] + 1,
+        availablePoints: user.stats.availablePoints - 1,
+      },
+    };
+
+    setUser(updatedUser);
+    saveUser(updatedUser);
+    soundService.playConfirm();
+  };
+
+  const equipItem = (item: InventoryItem) => {
+    if (!user) return;
+    if (!item.slot) {
+      setSystemNotif('This item cannot be equipped.');
+      soundService.playError();
+      return;
+    }
+
+    if (!user.equipment) {
+      user.equipment = {
+        weapon: null,
+        armor: null,
+        cloak: null,
+        gloves: null,
+        boots: null,
+        necklace: null,
+        ring1: null,
+        ring2: null,
+        rune: null,
+      };
+    }
+
+    const newEquipment = {
+      ...user.equipment,
+      [item.slot]: item.id,
+    };
+
+    const updatedUser: User = { ...user, equipment: newEquipment };
+    setUser(updatedUser);
+    saveUser(updatedUser);
+
+    setSystemNotif(`Equipped: ${item.name} in [${item.slot.toUpperCase()}]`);
+    soundService.playConfirm();
+  };
+
+  const unequipItem = (slot: EquipmentSlot) => {
+    if (!user || !user.equipment) return;
+
+    const newEquipment = { ...user.equipment, [slot]: null };
+    const updatedUser: User = { ...user, equipment: newEquipment };
+
+    setUser(updatedUser);
+    saveUser(updatedUser);
+
+    setSystemNotif(`Unequipped item from [${slot.toUpperCase()}]`);
+    soundService.playConfirm();
+  };
+
   const buyItem = (
     cost: number,
     itemName: string,
@@ -318,6 +415,22 @@ const App: React.FC = () => {
 
     let updatedUser = { ...user, gold: user.gold - cost };
     let message = `PURCHASED: [${itemName}] added to Item Box.`;
+
+    if (type === 'potion') {
+      setTodayProgress(prev =>
+        prev
+          ? {
+              ...prev,
+              pushups: prev.pushups + 20,
+              situps: prev.situps + 20,
+              squats: prev.squats + 20,
+              running: prev.running + 2,
+            }
+          : prev
+      );
+
+      message += '\nBuff Applied: +20 reps, +2 km today.';
+    }
 
     const newInv = addItemToInventory(user.email, {
       name: itemName,
@@ -347,24 +460,68 @@ const App: React.FC = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-950 p-4">
-        <SystemWindow title="Security Clearance" className="w-full max-w-md z-10">
-          {/* LOGIN FIELDS */}
+      <div className="min-h-screen flex items-center justify-center bg-slate-950 p-4 bg-[url('https://images.unsplash.com/photo-1518544806352-a2221ed0670d?q=80&w=2000&auto=format&fit=crop')] bg-cover bg-center">
+        <div className="absolute inset-0 bg-slate-950/90 backdrop-blur-sm"></div>
+
+        <SystemWindow title="Security Clearance" className="w-full max-w-md z-10 border-2 border-cyan-500/50">
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-white tracking-[0.2em] font-mono-tech system-text-shadow">
+              SYSTEM LOGIN
+            </h1>
+            <p className="text-cyan-400 text-xs mt-2 uppercase">Authentication Required</p>
+          </div>
+
+          <div className="space-y-4">
+            <div>
+              <label className="text-xs text-slate-400 uppercase tracking-widest block mb-1">
+                Player Name
+              </label>
+              <input
+                type="text"
+                placeholder="ENTER NAME"
+                className="w-full bg-slate-800/80 border border-slate-600 p-3 text-white focus:border-cyan-500 outline-none font-mono-tech text-lg"
+                value={nameInput}
+                onChange={e => setNameInput(e.target.value)}
+              />
+            </div>
+
+            <div>
+              <label className="text-xs text-slate-400 uppercase tracking-widest block mb-1">
+                Gmail Address
+              </label>
+              <input
+                type="email"
+                placeholder="ENTER GMAIL"
+                className="w-full bg-slate-800/80 border border-slate-600 p-3 text-white focus:border-cyan-500 outline-none font-mono-tech text-lg"
+                value={emailInput}
+                onChange={e => setEmailInput(e.target.value)}
+              />
+            </div>
+
+            <div className="pt-4 flex justify-center">
+              <Button onClick={handleLogin} className="w-full text-center justify-center flex py-4 text-xl">
+                INITIATE
+              </Button>
+            </div>
+          </div>
+
+          <div className="mt-6 text-center text-slate-600 text-[10px]">
+            SECURE CONNECTION // ENCRYPTED
+          </div>
         </SystemWindow>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-200 p-4 md:p-8">
-      
+    <div className={`min-h-screen transition-colors duration-1000 ${penaltyActive ? 'bg-red-950' : 'bg-slate-950'} text-slate-200 p-4 md:p-8 font-sans`}>
       {/* SHOP MODAL */}
-      {showShop && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
+      {showShop && !penaltyActive && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
           <SystemWindow title="Hunter Supply Shop" className="max-w-3xl w-full">
 
             <div className="max-h-[70vh] overflow-y-auto pr-2 grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-              {/* SHOP ITEMS HERE */}
+              {/* shop items … (same as your code, omitted for brevity) */}
             </div>
 
             <div className="flex justify-between items-center mt-4 pt-4 border-t border-slate-700">
@@ -379,32 +536,69 @@ const App: React.FC = () => {
       )}
 
       {/* ITEM BOX MODAL */}
-      {showItemBox && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
+      {showItemBox && !penaltyActive && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
           <SystemWindow title="Item Box" className="max-w-lg w-full">
 
             <div className="space-y-3 max-h-80 overflow-y-auto pr-1">
-
               {inventory.length === 0 ? (
-                <div className="text-slate-400 text-center py-6 text-sm">No items stored.</div>
+                <div className="text-slate-400 text-center py-6 text-sm">
+                  No items stored. Buy something from the Shop.
+                </div>
               ) : (
                 inventory.map((item) => (
-                  <div key={item.id}
+                  <div
+                    key={item.id}
                     className="p-3 bg-slate-800 border border-slate-700 rounded flex justify-between items-center"
                   >
                     <div className="flex flex-col">
                       <span className="font-bold text-cyan-300 text-sm">
                         {item.name}
+                        <span className={`text-[10px] uppercase ml-1 ${
+                          item.rarity === "Common" ? "text-slate-400"
+                          : item.rarity === "Rare" ? "text-blue-300"
+                          : item.rarity === "Epic" ? "text-purple-300"
+                          : "text-yellow-300"
+                        }`}>
+                          [{item.rarity}]
+                        </span>
                       </span>
+
                       <span className="text-xs text-slate-400">{item.desc}</span>
+                      <span className="text-[10px] text-slate-500 mt-1 uppercase">
+                        Type: {item.type}{item.slot ? ` · Slot: ${item.slot}` : ""}
+                      </span>
                     </div>
 
                     <div className="flex flex-col gap-1">
-                      <Button className="text-[10px] px-2 py-1"
+                      {(item.type === "gear" || item.type === "rune") && (
+                        <Button
+                          onClick={() => equipItem(item)}
+                          className="text-[10px] px-2 py-1"
+                        >
+                          Equip
+                        </Button>
+                      )}
+
+                      <Button
                         onClick={() => {
                           const updated = removeItem(user.email, item.id);
                           setInventory(updated);
-                        }}>
+                          setSystemNotif(`${item.name} used.`);
+                        }}
+                        className="text-[10px] px-2 py-1"
+                      >
+                        Use
+                      </Button>
+
+                      <Button
+                        onClick={() => {
+                          const updated = removeItem(user.email, item.id);
+                          setInventory(updated);
+                        }}
+                        variant="secondary"
+                        className="text-[10px] px-2 py-1"
+                      >
                         Discard
                       </Button>
                     </div>
@@ -413,6 +607,7 @@ const App: React.FC = () => {
               )}
             </div>
 
+            {/* ❗ FIXED CLOSE BUTTON FOR ITEM BOX */}
             <div className="flex justify-end mt-4 pt-4 border-t border-slate-700">
               <Button onClick={() => setShowItemBox(false)}>Close</Button>
             </div>
@@ -421,8 +616,132 @@ const App: React.FC = () => {
         </div>
       )}
 
-      {/* HEADER + MAIN UI BELOW */}
-      {/* ... (your full JSX continues here exactly as before) ... */}
+      {/* SYSTEM NOTIFICATION */}
+      {systemNotif && !penaltyActive && !showShop && !showItemBox && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+          <SystemWindow title="System Notification" className="max-w-lg w-full">
+            <div className="font-mono-tech text-lg text-cyan-100 mb-6 whitespace-pre-wrap">
+              {systemNotif}
+            </div>
+            <div className="flex justify-end">
+              <Button onClick={closeNotif}>Acknowledge</Button>
+            </div>
+          </SystemWindow>
+        </div>
+      )}
+
+      {/* HEADER */}
+      <div className="max-w-6xl mx-auto mb-8">
+        <div className="flex justify-between items-start md:items-end flex-col md:flex-row gap-4">
+
+          <div>
+            <h1 className="text-3xl font-bold italic tracking-tighter text-white uppercase">
+              Player: <span className={penaltyActive ? "text-red-500" : "text-cyan-400"}>
+                {user.username}
+              </span>
+            </h1>
+
+            <div className="flex items-center gap-4 text-xs text-slate-400 mt-1 uppercase tracking-widest">
+              <span>ID: {user.email}</span>
+              <button
+                onClick={handleLogout}
+                className="text-red-400 hover:text-red-300 border-b border-red-900"
+              >
+                [LOGOUT]
+              </button>
+            </div>
+          </div>
+
+          <div className="text-right flex flex-col items-end w-full md:w-auto">
+            <div className="flex gap-2 mb-2">
+
+              <Button
+                onClick={() => setShowShop(true)}
+                className="text-xs py-1 px-2 border-yellow-600 text-yellow-500 hover:text-yellow-300"
+              >
+                SHOP
+              </Button>
+
+              <Button
+                onClick={() => setShowItemBox(true)}
+                className="text-xs py-1 px-2 border-cyan-600 text-cyan-400 hover:text-cyan-200"
+              >
+                ITEM BOX
+              </Button>
+
+              {!notificationsEnabled && (
+                <button
+                  onClick={enableNotifications}
+                  className="text-[10px] text-cyan-500 border border-cyan-500 px-2 py-0.5 uppercase hover:bg-cyan-500/20"
+                >
+                  Enable Alerts
+                </button>
+              )}
+            </div>
+
+            <div className="text-xs text-slate-400 uppercase tracking-widest">Level</div>
+            <div className="text-4xl font-bold text-white leading-none font-mono-tech">
+              {user.level}
+            </div>
+          </div>
+
+        </div>
+
+        <ProgressBar
+          current={Math.floor(user.currentXp)}
+          max={user.requiredXp}
+          label="Experience"
+          color={penaltyActive ? "bg-red-600" : "bg-yellow-500"}
+        />
+      </div>
+
+      {/* MAIN GRID */}
+      <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+        <div className="lg:col-span-1">
+          {todayProgress && (
+            <QuestTracker
+              progress={todayProgress}
+              onUpdate={updateProgress}
+              onComplete={completeQuest}
+              onForfeit={() => triggerPenalty("PLAYER FORFEIT")}
+              isCompleted={todayProgress.completed}
+            />
+          )}
+        </div>
+
+        <div className="lg:col-span-1">
+          <StatusWindow
+            user={user}
+            onUpgradeStat={upgradeStat}
+            equippedBonuses={equippedBonuses}
+            onUnequip={unequipItem}
+          />
+        </div>
+
+        <div className="lg:col-span-1 space-y-6">
+          <SystemChat user={user} />
+
+          <SystemWindow title="Streak Info" className="h-40 flex flex-col justify-center items-center">
+            <div className="text-sm text-slate-400 uppercase mb-2">Current Streak</div>
+
+            <div className="text-5xl font-bold text-white font-mono-tech system-text-shadow">
+              {user.streak} <span className="text-lg text-slate-500">DAYS</span>
+            </div>
+
+            {user.streak > 7 && (
+              <div className="text-xs text-yellow-500 mt-2 font-bold uppercase tracking-widest">
+                Consistent Hunter Bonus Active
+              </div>
+            )}
+          </SystemWindow>
+        </div>
+
+      </div>
+
+      <div className="max-w-6xl mx-auto mt-12 text-center text-slate-600 text-xs font-mono-tech pb-8">
+        SYSTEM ID: SOLO-LVL-TRAINER-V2.0.0 // AUTH: GMAIL // STATUS: ONLINE
+      </div>
 
     </div>
   );
