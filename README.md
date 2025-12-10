@@ -1,7 +1,5 @@
 # ⚔️ Solo Leveling Training System — React + Vite
 
-![Solo Leveling Training System Banner](./assets/solo-leveling-banner.png)
-
 > **Created by Shadow Monarch — Siddardha** (`@sajjala-siddardha`)
 
 ![License: All Rights Reserved](https://img.shields.io/badge/License-All%20Rights%20Reserved-red.svg)
