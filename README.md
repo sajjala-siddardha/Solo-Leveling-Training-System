@@ -1,5 +1,7 @@
 # ⚔️ Solo Leveling Training System — React + Vite
 
+![License: All Rights Reserved](https://img.shields.io/badge/License-All%20Rights%20Reserved-red.svg)
+
 A gamified training assistant inspired by **Solo Leveling**, built using **React**, **TypeScript**, **Vite**, and **Gemini AI**.  
 Complete your daily quests, manage inventory, equip gear, chat with the System, and level up — just like a real hunter.
 
@@ -23,6 +25,8 @@ Complete your daily quests, manage inventory, equip gear, chat with the System, 
 ---
 
 ## 📁 PROJECT STRUCTURE
+
+
 
 ```txt
 src/
@@ -55,119 +59,70 @@ README.md
 ```
 
 ---
-
-## 🔐 Environment Setup
-
-Create a file:
-
-```
-.env.local
-```
-
-Inside add:
-
-```
-VITE_GEMINI_API_KEY=YOUR_API_KEY_HERE
-```
-
-⚠️ Never upload this file (it is protected by `.gitignore`).
-
----
-
-## 🛠 Installation
-
-Install packages:
-
-```bash
-npm install
-```
-
-Run development server:
-
-```bash
-npm run dev
-```
-
-Build for production:
-
-```bash
-npm run build
-```
-
-Preview production build:
-
-```bash
-npm run preview
-```
-
----
-
-## ☁️ Deploy on Vercel
-
-1. Push repo to GitHub  
-2. Go to **Vercel.com → Import Repository**
-3. Add an environment variable:
-
-```
-VITE_GEMINI_API_KEY=YOUR_KEY_HERE
-```
-
-4. Deploy ✔
-
----
-
-## 🤖 System Chat
+🤖 System Chat
 
 The System Consultant can answer:
 
-- Training recommendations  
-- Diet advice  
-- Motivation  
-- Solo Leveling–style responses  
-- Clear chat feature  
-- Memory saved in LocalStorage  
+Training recommendations
 
+Diet advice
+
+Motivation
+
+Solo Leveling–style responses
+
+Clear chat feature
+
+Memory saved in LocalStorage
 ---
+🎒 Inventory & Gear System
 
-## 🎒 Inventory & Gear System
+Purchase items from Shop
 
-- Purchase items from Shop  
-- Equip Gear (weapon/armor/cloak/rings/runes)  
-- Potions give temporary boosts  
-- Runes grant stat enhancements  
-- Materials & Boxes stored for later use  
+Equip Gear (weapon/armor/cloak/rings/runes)
 
+Potions give temporary boosts
+
+Runes grant stat enhancements
+
+Materials & Boxes stored for later use
 ---
+🔥 Penalty Mode
 
-## 🔥 Penalty Mode
+If quests remain incomplete after 20:00:
 
-If quests remain incomplete after **20:00**:
+System activates penalty
 
-- System activates penalty  
-- User must survive by rapid clicking  
-- Alarms and dramatic UI effects  
-- Inspired by Solo Leveling time-limit scenes  
+User must survive by rapid clicking
 
+Alarms and dramatic UI effects
+
+Inspired by Solo Leveling time-limit scenes
 ---
+🧙 Powered By
 
-## 🧙 Powered By
+React + TypeScript
 
-- React + TypeScript  
-- Vite  
-- Gemini AI  
-- TailwindCSS  
-- LocalStorage persistence  
+Vite
 
+Gemini AI
+
+TailwindCSS
+
+LocalStorage persistence
 ---
+⭐ Give the Project a Star
 
-## ⭐ Give the Project a Star
-
-If you like the project, please ⭐ the repo!  
+If you like the project, please ⭐ the repo!
 More updates coming soon — raids, dungeon mode, awakening system, pets, and more.
-
 ---
+📞 Developer
 
-## 📞 Developer
-
-**Built by:** *Sajjala Siddardha*  
+Built by: Sajjala Siddardha
 Solo Leveling Inspired Trainer System
+---
+🔐 License
+
+© 2025 Sajjala Siddardha — Solo-Leveling-Training-System
+All rights reserved.
+Unauthorized copying, reuse, modification, or distribution of any part of this project is strictly prohibited.
